@@ -1,0 +1,218 @@
+import 'dart:io';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import '../../shared/models/models.dart';
+import '../logger/black_box_logger.dart';
+import '../security/command_validator.dart';
+
+/// Enhanced ADB Client with ChangeNotifier and extensive logging
+class ADBClient extends ChangeNotifier {
+  static final ADBClient _instance = ADBClient._internal();
+  factory ADBClient() => _instance;
+  ADBClient._internal();
+
+  String? _connectedIp;
+  int? _connectedPort;
+  bool _useRoot = false;
+  final _logger = BlackBoxLogger();
+  final _rateLimiter = RateLimiter();
+
+  bool get isConnected => _connectedIp != null;
+  String? get connectedDevice => _connectedIp;
+  bool get useRoot => _useRoot;
+
+  void toggleRoot(bool value) {
+    _useRoot = value;
+    notifyListeners();
+  }
+
+  Future<bool> connect(String ip, int port) async {
+    try {
+      final socket =
+          await Socket.connect(ip, port, timeout: const Duration(seconds: 5));
+      await socket.close();
+
+      _connectedIp = ip;
+      _connectedPort = port;
+
+      await _logger.log(
+        operation: LogOperation.CONNECTION,
+        details: 'Connected to $ip:$port',
+        status: LogStatus.SUCCESS,
+        deviceIp: ip,
+      );
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      await _logger.log(
+        operation: LogOperation.CONNECTION,
+        details: 'Failed to connect: $e',
+        status: LogStatus.FAILED,
+        deviceIp: ip,
+      );
+      return false;
+    }
+  }
+
+  Future<void> disconnect() async {
+    if (_connectedIp != null) {
+      await _logger.log(
+        operation: LogOperation.DISCONNECTION,
+        details: 'Disconnected from $_connectedIp',
+        status: LogStatus.SUCCESS,
+        deviceIp: _connectedIp,
+      );
+    }
+    _connectedIp = null;
+    _connectedPort = null;
+    notifyListeners();
+  }
+
+  Future<CommandResult> executeCommand(String command) async {
+    if (!isConnected) {
+      return CommandResult(
+        success: false,
+        command: command,
+        output: '',
+        error: 'Cihaz bağlı değil',
+      );
+    }
+
+    if (!_rateLimiter.canExecute()) {
+      return CommandResult(
+        success: false,
+        command: command,
+        output: '',
+        error: 'Çok fazla istek. Lütfen bekleyin.',
+      );
+    }
+
+    final validation = CommandValidator.validate(command);
+    if (!validation.isValid) {
+      await _logger.log(
+        operation: LogOperation.COMMAND,
+        details: 'Engellendi: ${validation.error}',
+        status: LogStatus.FAILED,
+        command: command,
+        deviceIp: _connectedIp,
+      );
+
+      return CommandResult(
+        success: false,
+        command: command,
+        output: '',
+        error: validation.error,
+      );
+    }
+
+    try {
+      final actualCommand = _useRoot ? 'su -c "$command"' : command;
+
+      final result = await Process.run(
+        'adb',
+        ['-s', '$_connectedIp:$_connectedPort', 'shell', actualCommand],
+      ).timeout(const Duration(seconds: 15));
+
+      final success = result.exitCode == 0;
+      final output = result.stdout.toString();
+      final error = result.stderr.toString();
+      final combinedOutput =
+          output + (error.isNotEmpty ? '\nERROR: $error' : '');
+
+      await _logger.log(
+        operation: LogOperation.COMMAND,
+        details: 'Komut çalıştırıldı',
+        status: success ? LogStatus.SUCCESS : LogStatus.FAILED,
+        command: actualCommand,
+        output: combinedOutput,
+        deviceIp: _connectedIp,
+      );
+
+      return CommandResult(
+        success: success,
+        command: actualCommand,
+        output: output,
+        error: error.isNotEmpty ? error : (success ? null : 'Bilinmeyen hata'),
+      );
+    } catch (e) {
+      await _logger.log(
+        operation: LogOperation.ERROR,
+        details: 'ADB Hatası: $e',
+        status: LogStatus.FAILED,
+        command: command,
+        deviceIp: _connectedIp,
+      );
+
+      return CommandResult(
+        success: false,
+        command: command,
+        output: '',
+        error: e.toString(),
+      );
+    }
+  }
+
+  Future<CommandResult> installAPK(String apkPath) async {
+    if (!isConnected)
+      return CommandResult(
+          success: false,
+          command: 'install',
+          output: '',
+          error: 'Cihaz bağlı değil');
+
+    try {
+      final result = await Process.run(
+        'adb',
+        ['-s', '$_connectedIp:$_connectedPort', 'install', '-r', '-g', apkPath],
+      ).timeout(const Duration(minutes: 5));
+
+      final success = result.exitCode == 0;
+      final output = result.stdout.toString() + result.stderr.toString();
+
+      await _logger.log(
+        operation: LogOperation.APK_INSTALL,
+        details: 'APK kurulumu: $apkPath',
+        status: success ? LogStatus.SUCCESS : LogStatus.FAILED,
+        command: 'install ${apkPath.split('/').last}',
+        output: output,
+        deviceIp: _connectedIp,
+      );
+
+      return CommandResult(
+        success: success,
+        command: 'install $apkPath',
+        output: output,
+        error: success ? null : 'Kurulum başarısız: $output',
+      );
+    } catch (e) {
+      return CommandResult(
+          success: false, command: 'install', output: '', error: e.toString());
+    }
+  }
+
+  Future<bool> grantPermission(String packageName, String permission) async {
+    final result = await executeCommand('pm grant $packageName $permission');
+
+    await _logger.log(
+      operation: LogOperation.PERMISSION_GRANT,
+      details: '$packageName - $permission',
+      status: result.success ? LogStatus.SUCCESS : LogStatus.FAILED,
+      deviceIp: _connectedIp,
+    );
+
+    return result.success;
+  }
+
+  Future<List<String>> getInstalledPackages() async {
+    final result = await executeCommand('pm list packages -3');
+    if (!result.success) return [];
+
+    return result.output
+        .split('\n')
+        .where((line) => line.startsWith('package:'))
+        .map((line) => line.replaceFirst('package:', '').trim())
+        .where((pkg) => pkg.isNotEmpty)
+        .toList();
+  }
+}
