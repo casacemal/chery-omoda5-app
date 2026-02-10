@@ -21,8 +21,50 @@ class ADBClient extends ChangeNotifier {
   String? get connectedDevice => _connectedIp;
   bool get useRoot => _useRoot;
 
-  void toggleRoot(bool value) {
-    _useRoot = value;
+  Future<bool> enableRoot() async {
+    if (!isConnected) {
+      return false;
+    }
+
+    try {
+      final result = await Process.run(
+        'adb',
+        ['-s', '$_connectedIp:$_connectedPort', 'root'],
+      ).timeout(const Duration(seconds: 10));
+
+      if (result.exitCode == 0) {
+        _useRoot = true;
+        notifyListeners();
+
+        await _logger.log(
+          operation: LogOperation.CONNECTION,
+          details: 'Root mode etkinleştirildi',
+          status: LogStatus.SUCCESS,
+          deviceIp: _connectedIp,
+        );
+        return true;
+      } else {
+        await _logger.log(
+          operation: LogOperation.ERROR,
+          details: 'Root mode başarısız: ${result.stderr}',
+          status: LogStatus.FAILED,
+          deviceIp: _connectedIp,
+        );
+        return false;
+      }
+    } catch (e) {
+      await _logger.log(
+        operation: LogOperation.ERROR,
+        details: 'Root mode hatası: $e',
+        status: LogStatus.FAILED,
+        deviceIp: _connectedIp,
+      );
+      return false;
+    }
+  }
+
+  void disableRoot() {
+    _useRoot = false;
     notifyListeners();
   }
 
@@ -66,6 +108,7 @@ class ADBClient extends ChangeNotifier {
     }
     _connectedIp = null;
     _connectedPort = null;
+    _useRoot = false;
     notifyListeners();
   }
 
@@ -107,7 +150,9 @@ class ADBClient extends ChangeNotifier {
     }
 
     try {
-      final actualCommand = _useRoot ? 'su -c "$command"' : command;
+      // Root mode aktif ise doğrudan komut çalıştır
+      // (adb root komutu ile daemon root olarak başlatıldı)
+      final actualCommand = command;
 
       final result = await Process.run(
         'adb',
