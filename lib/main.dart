@@ -29,7 +29,7 @@ class CheryMasterControllerApp extends StatelessWidget {
           backgroundColor: AppConstants.primaryRed,
           elevation: 0,
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: AppConstants.surfaceDark,
           elevation: 4,
           shape: RoundedRectangleBorder(
