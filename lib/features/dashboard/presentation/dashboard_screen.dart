@@ -53,7 +53,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     scale: 0.8,
                     child: Switch(
                       value: _adbClient.useRoot,
-                      onChanged: (val) => _adbClient.enableRoot(val),
+                      onChanged: (val) { 
+if (val) { _adbClient.enableRoot; }}
                       activeColor: AppConstants.successGreen,
                     ),
                   ),
