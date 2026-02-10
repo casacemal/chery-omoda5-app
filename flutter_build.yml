@@ -1,48 +1,36 @@
-name: Flutter Build & Sign APK
+name: Flutter Build
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ "main", "master" ] # Hangi branch'i kullanıyorsan
+  workflow_dispatch: # Bu satır sayesinde manuel olarak da başlatabilirsin
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Java
+      - uses: actions/checkout@v4
+      
+      - name: Java Setup
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Setup Flutter
+          
+      - name: Flutter Setup
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
+          channel: 'stable'
           cache: true
 
-      - name: Decode Keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
-
-      - name: Install dependencies
+      - name: Get Packages
         run: flutter pub get
 
-      - name: Build Signed APK
-        run: |
-          flutter build apk --release --split-per-abi \
-            --build-name=1.0.${{ github.run_number }} \
-            --build-number=${{ github.run_number }}
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Build APK
+        run: flutter build apk --debug # İlk deneme için debug en hızlısıdır
 
-      - name: Upload Artifacts
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apks
+          name: chery-uygulama
           path: build/app/outputs/flutter-apk/*.apk
