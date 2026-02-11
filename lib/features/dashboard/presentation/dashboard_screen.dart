@@ -51,7 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const Text('Root', style: TextStyle(fontSize: 10)),
                   Transform.scale(
                     scale: 0.8,
-                    child: Switch(
+                    child: Switch (
                       value: _adbClient.useRoot,
                       if (val) { 
                           await _adbClient.enableRoot; // 
