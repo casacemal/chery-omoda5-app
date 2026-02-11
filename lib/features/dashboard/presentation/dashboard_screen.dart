@@ -46,28 +46,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             actions: [
-              Row(
-                children: [
-                  const Text('Root', style: TextStyle(fontSize: 10)),
-                  Transform.scale(
-                    scale: 0.8,
-                    child: Switch (
-                      value: _adbClient.useRoot,
-                      if (val) { 
-                          await _adbClient.enableRoot; // 
-                          } else {
-                            await _adbClient.disableRoot;
-                          }
-                      setState(() { 
-                          _adbClient.disableRoot = val;
-                      });
-                      activeColor: AppConstants.successGreen,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
-            ],
+  Row(
+    children: [
+      const Text('Root', style: TextStyle(fontSize: 10)),
+      Transform.scale(
+        scale: 0.8,
+        child: Switch(
+          value: _adbClient.useRoot,
+          onChanged: (bool val) async {
+            // Root durumunu güncelle
+            if (val) {
+              await _adbClient.enableRoot();
+            } else {
+              await _adbClient.disableRoot();
+            }
+            
+            // Eğer UI'ın hemen güncellenmesi gerekiyorsa setState kullanabilirsin
+            // Ancak ListenableBuilder kullandığın için adbClient içinden 
+            // notifyListeners() çağırmak daha sağlıklı bir yöntemdir.
+            setState(() {}); 
+          },
+          activeColor: AppConstants.successGreen,
+        ),
+          ),
+          ],
+           ),
+  const SizedBox(width: 8),
+           ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(56),
               child: Container(
