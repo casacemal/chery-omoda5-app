@@ -194,7 +194,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String subtitle,
     required IconData icon,
     required Gradient gradient,
-    required VoidCallback onTap,
+
   }) {
     return InkWell(
       onTap: onTap,
