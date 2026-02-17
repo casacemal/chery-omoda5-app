@@ -189,14 +189,14 @@ class _APKManagerScreenState extends State<APKManagerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.check_circle,
                           color: AppConstants.successGreen,
                         ),
-                        const SizedBox(width: 12),
-                        const Text(
+                        SizedBox(width: 12),
+                        Text(
                           'Son Yüklenen Paket',
                           style: TextStyle(
                             fontSize: 16,

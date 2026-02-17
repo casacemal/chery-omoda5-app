@@ -148,7 +148,7 @@ class BlackBoxLogger {
           .toList();
 
       final cutoffDate = DateTime.now().subtract(
-        Duration(days: AppConstants.logRetentionDays),
+        const Duration(days: AppConstants.logRetentionDays),
       );
 
       for (final file in files) {

@@ -199,12 +199,13 @@ class ADBClient extends ChangeNotifier {
   }
 
   Future<CommandResult> installAPK(String apkPath) async {
-    if (!isConnected)
+    if (!isConnected) {
       return CommandResult(
           success: false,
           command: 'install',
           output: '',
           error: 'Cihaz bağlı değil');
+    }
 
     try {
       final result = await Process.run(

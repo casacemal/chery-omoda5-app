@@ -38,20 +38,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Row(
+            title: const Row(
               children: [
-                const Icon(Icons.directions_car, size: 28),
-                const SizedBox(width: 12),
-                const Text(AppConstants.appName),
+                Icon(Icons.directions_car, size: 28),
+                SizedBox(width: 12),
+                Text(AppConstants.appName),
               ],
             ),
-        
-
-
-  const SizedBox(width: 8),
-           ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(56),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(56),
               child: Container(
                 padding: const EdgeInsets.all(12),
                 color: AppConstants.surfaceDark,
@@ -194,7 +189,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String subtitle,
     required IconData icon,
     required Gradient gradient,
-
+    required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,

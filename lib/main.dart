@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'core/constants/app_constants.dart';
 
@@ -18,11 +17,10 @@ class CheryMasterControllerApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.dark(
+        colorScheme: const ColorScheme.dark(
           primary: AppConstants.primaryRed,
           secondary: AppConstants.primaryRedLight,
           surface: AppConstants.surfaceDark,
-          background: AppConstants.backgroundDark,
         ),
         scaffoldBackgroundColor: AppConstants.backgroundDark,
         appBarTheme: const AppBarTheme(
