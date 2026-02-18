@@ -37,26 +37,26 @@ class ADBClient extends ChangeNotifier {
         notifyListeners();
 
         await _logger.log(
-          operation: LogOperation.CONNECTION,
+          operation: LogOperation.connection,
           details: 'Root mode etkinleştirildi',
-          status: LogStatus.SUCCESS,
+          status: LogStatus.success,
           deviceIp: _connectedIp,
         );
         return true;
       } else {
         await _logger.log(
-          operation: LogOperation.ERROR,
+          operation: LogOperation.error,
           details: 'Root mode başarısız: ${result.stderr}',
-          status: LogStatus.FAILED,
+          status: LogStatus.failed,
           deviceIp: _connectedIp,
         );
         return false;
       }
     } catch (e) {
       await _logger.log(
-        operation: LogOperation.ERROR,
+        operation: LogOperation.error,
         details: 'Root mode hatası: $e',
-        status: LogStatus.FAILED,
+        status: LogStatus.failed,
         deviceIp: _connectedIp,
       );
       return false;
@@ -78,9 +78,9 @@ class ADBClient extends ChangeNotifier {
       _connectedPort = port;
 
       await _logger.log(
-        operation: LogOperation.CONNECTION,
+        operation: LogOperation.connection,
         details: 'Connected to $ip:$port',
-        status: LogStatus.SUCCESS,
+        status: LogStatus.success,
         deviceIp: ip,
       );
 
@@ -88,9 +88,9 @@ class ADBClient extends ChangeNotifier {
       return true;
     } catch (e) {
       await _logger.log(
-        operation: LogOperation.CONNECTION,
+        operation: LogOperation.connection,
         details: 'Failed to connect: $e',
-        status: LogStatus.FAILED,
+        status: LogStatus.failed,
         deviceIp: ip,
       );
       return false;
@@ -100,9 +100,9 @@ class ADBClient extends ChangeNotifier {
   Future<void> disconnect() async {
     if (_connectedIp != null) {
       await _logger.log(
-        operation: LogOperation.DISCONNECTION,
+        operation: LogOperation.disconnection,
         details: 'Disconnected from $_connectedIp',
-        status: LogStatus.SUCCESS,
+        status: LogStatus.success,
         deviceIp: _connectedIp,
       );
     }
@@ -134,9 +134,9 @@ class ADBClient extends ChangeNotifier {
     final validation = CommandValidator.validate(command);
     if (!validation.isValid) {
       await _logger.log(
-        operation: LogOperation.COMMAND,
+        operation: LogOperation.command,
         details: 'Engellendi: ${validation.error}',
-        status: LogStatus.FAILED,
+        status: LogStatus.failed,
         command: command,
         deviceIp: _connectedIp,
       );
@@ -166,9 +166,9 @@ class ADBClient extends ChangeNotifier {
           output + (error.isNotEmpty ? '\nERROR: $error' : '');
 
       await _logger.log(
-        operation: LogOperation.COMMAND,
+        operation: LogOperation.command,
         details: 'Komut çalıştırıldı',
-        status: success ? LogStatus.SUCCESS : LogStatus.FAILED,
+        status: success ? LogStatus.success : LogStatus.failed,
         command: actualCommand,
         output: combinedOutput,
         deviceIp: _connectedIp,
@@ -182,9 +182,9 @@ class ADBClient extends ChangeNotifier {
       );
     } catch (e) {
       await _logger.log(
-        operation: LogOperation.ERROR,
+        operation: LogOperation.error,
         details: 'ADB Hatası: $e',
-        status: LogStatus.FAILED,
+        status: LogStatus.failed,
         command: command,
         deviceIp: _connectedIp,
       );
@@ -217,9 +217,9 @@ class ADBClient extends ChangeNotifier {
       final output = result.stdout.toString() + result.stderr.toString();
 
       await _logger.log(
-        operation: LogOperation.APK_INSTALL,
+        operation: LogOperation.apkInstall,
         details: 'APK kurulumu: $apkPath',
-        status: success ? LogStatus.SUCCESS : LogStatus.FAILED,
+        status: success ? LogStatus.success : LogStatus.failed,
         command: 'install ${apkPath.split('/').last}',
         output: output,
         deviceIp: _connectedIp,
@@ -241,9 +241,9 @@ class ADBClient extends ChangeNotifier {
     final result = await executeCommand('pm grant $packageName $permission');
 
     await _logger.log(
-      operation: LogOperation.PERMISSION_GRANT,
+      operation: LogOperation.permissionGrant,
       details: '$packageName - $permission',
-      status: result.success ? LogStatus.SUCCESS : LogStatus.FAILED,
+      status: result.success ? LogStatus.success : LogStatus.failed,
       deviceIp: _connectedIp,
     );
 

@@ -87,7 +87,7 @@ class _EmergencyRecoveryScreenState extends State<EmergencyRecoveryScreen> {
             end: Alignment.bottomCenter,
             colors: [
               AppConstants.primaryRed,
-              AppConstants.primaryRedLight.withOpacity(0.7),
+              AppConstants.primaryRedLight.withAlpha(178), // withOpacity(0.7)
               AppConstants.backgroundDark,
             ],
           ),
@@ -289,21 +289,23 @@ class _EmergencyRecoveryScreenState extends State<EmergencyRecoveryScreen> {
     setState(() => _isExecuting = false);
 
     if (result.success) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Sistemdeki Launcher\'lar'),
-          content: SingleChildScrollView(
-            child: Text(result.output),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Kapat'),
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Sistemdeki Launcher\'lar'),
+            content: SingleChildScrollView(
+              child: Text(result.output),
             ),
-          ],
-        ),
-      );
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Kapat'),
+              ),
+            ],
+          ),
+        );
+      }
     } else {
       Fluttertoast.showToast(
         msg: 'Hata: ${result.error}',
@@ -313,40 +315,42 @@ class _EmergencyRecoveryScreenState extends State<EmergencyRecoveryScreen> {
   }
 
   Future<void> _resetLauncherPreference() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Launcher Sıfırlama'),
-        content: const Text(
-          'Bu işlem varsayılan launcher tercihini sıfırlayacak ve ardından Altın Komutu çalıştıracak.\n\nDevam edilsin mi?',
+    if (mounted) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Launcher Sıfırlama'),
+          content: const Text(
+            'Bu işlem varsayılan launcher tercihini sıfırlayacak ve ardından Altın Komutu çalıştıracak.\n\nDevam edilsin mi?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Evet'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Evet'),
-          ),
-        ],
-      ),
-    );
+      );
 
-    if (confirmed != true) return;
+      if (confirmed != true) return;
 
-    setState(() => _isExecuting = true);
+      setState(() => _isExecuting = true);
 
-    await widget.adbClient.executeCommand('pm clear-package-preferred-activities com.android.launcher3');
-    await Future.delayed(const Duration(milliseconds: 500));
-    await widget.adbClient.executeCommand(AppConstants.goldenCommand);
+      await widget.adbClient.executeCommand('pm clear-package-preferred-activities com.android.launcher3');
+      await Future.delayed(const Duration(milliseconds: 500));
+      await widget.adbClient.executeCommand(AppConstants.goldenCommand);
 
-    setState(() => _isExecuting = false);
+      setState(() => _isExecuting = false);
 
-    Fluttertoast.showToast(
-      msg: '✓ Launcher sıfırlandı ve CarWebGuru başlatıldı',
-      backgroundColor: AppConstants.successGreen,
-      toastLength: Toast.LENGTH_LONG,
-    );
+      Fluttertoast.showToast(
+        msg: '✓ Launcher sıfırlandı ve CarWebGuru başlatıldı',
+        backgroundColor: AppConstants.successGreen,
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } 
   }
 }

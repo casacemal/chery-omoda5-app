@@ -221,7 +221,7 @@ class _DeviceScannerScreenState extends State<DeviceScannerScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withAlpha(25), // withOpacity(0.1)
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(statusIcon, color: statusColor, size: 32),
@@ -258,10 +258,10 @@ class _DeviceScannerScreenState extends State<DeviceScannerScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.2),
+                              color: statusColor.withAlpha(51), // withOpacity(0.2)
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                  color: statusColor.withOpacity(0.5)),
+                                  color: statusColor.withAlpha(128)), // withOpacity(0.5)
                             ),
                             child: Text(
                               statusText,

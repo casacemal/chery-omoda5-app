@@ -200,7 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withAlpha(77), // withOpacity(0.3)
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -225,7 +225,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withAlpha(230), // withOpacity(0.9)
               ),
               textAlign: TextAlign.center,
             ),

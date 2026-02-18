@@ -150,11 +150,11 @@ class _CommandPanelScreenState extends State<CommandPanelScreen> {
             children: [
               Expanded(
                   child: _buildKeyButton('GERİ', Icons.arrow_back,
-                      KeyCodes.KEYCODE_BACK, AppConstants.primaryRed)),
+                      KeyCodes.keyCodeBack, AppConstants.primaryRed)),
               const SizedBox(width: 12),
               Expanded(
                   child: _buildKeyButton('ANA MENÜ', Icons.home,
-                      KeyCodes.KEYCODE_HOME, AppConstants.primaryRed)),
+                      KeyCodes.keyCodeHome, AppConstants.primaryRed)),
             ],
           ),
           const SizedBox(height: 24),
@@ -164,15 +164,15 @@ class _CommandPanelScreenState extends State<CommandPanelScreen> {
             children: [
               Expanded(
                   child: _buildKeyButton('SES +', Icons.volume_up,
-                      KeyCodes.KEYCODE_VOLUME_UP, AppConstants.successGreen)),
+                      KeyCodes.keyCodeVolumeUp, AppConstants.successGreen)),
               const SizedBox(width: 12),
               Expanded(
                   child: _buildKeyButton('SES -', Icons.volume_down,
-                      KeyCodes.KEYCODE_VOLUME_DOWN, AppConstants.successGreen)),
+                      KeyCodes.keyCodeVolumeDown, AppConstants.successGreen)),
               const SizedBox(width: 12),
               Expanded(
                   child: _buildKeyButton('GÜÇ', Icons.power_settings_new,
-                      KeyCodes.KEYCODE_POWER, AppConstants.warningOrange)),
+                      KeyCodes.keyCodePower, AppConstants.warningOrange)),
             ],
           ),
           const SizedBox(height: 24),
@@ -272,26 +272,26 @@ class _CommandPanelScreenState extends State<CommandPanelScreen> {
                 top: 0,
                 left: 60,
                 child: _buildDPadBtn(
-                    Icons.arrow_upward, KeyCodes.KEYCODE_DPAD_UP)),
+                    Icons.arrow_upward, KeyCodes.keyCodeDpadUp)),
             Positioned(
                 bottom: 0,
                 left: 60,
                 child: _buildDPadBtn(
-                    Icons.arrow_downward, KeyCodes.KEYCODE_DPAD_DOWN)),
+                    Icons.arrow_downward, KeyCodes.keyCodeDpadDown)),
             Positioned(
                 left: 0,
                 top: 60,
                 child: _buildDPadBtn(
-                    Icons.arrow_back, KeyCodes.KEYCODE_DPAD_LEFT)),
+                    Icons.arrow_back, KeyCodes.keyCodeDpadLeft)),
             Positioned(
                 right: 0,
                 top: 60,
                 child: _buildDPadBtn(
-                    Icons.arrow_forward, KeyCodes.KEYCODE_DPAD_RIGHT)),
+                    Icons.arrow_forward, KeyCodes.keyCodeDpadRight)),
             Positioned(
                 top: 60,
                 left: 60,
-                child: _buildDPadBtn(Icons.circle, KeyCodes.KEYCODE_DPAD_CENTER,
+                child: _buildDPadBtn(Icons.circle, KeyCodes.keyCodeDpadCenter,
                     isCenter: true)),
           ],
         ),

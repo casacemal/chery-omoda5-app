@@ -14,6 +14,7 @@ class NetworkScanner {
       final wifiIP = await _networkInfo.getWifiIP();
       return wifiIP;
     } catch (e) {
+      // ignore: avoid_print
       print('Error getting phone IP: $e');
       return null;
     }
@@ -32,17 +33,17 @@ class NetworkScanner {
 
   Future<List<DeviceInfo>> scanNetwork() async {
     await _logger.log(
-      operation: LogOperation.SCAN,
+      operation: LogOperation.scan,
       details: 'Network scan started',
-      status: LogStatus.SUCCESS,
+      status: LogStatus.success,
     );
 
     final phoneIP = await getPhoneIP();
     if (phoneIP == null) {
       await _logger.log(
-        operation: LogOperation.SCAN,
+        operation: LogOperation.scan,
         details: 'Failed - No IP address',
-        status: LogStatus.FAILED,
+        status: LogStatus.failed,
       );
       return [];
     }
@@ -73,9 +74,9 @@ class NetworkScanner {
     await Future.wait(futures);
 
     await _logger.log(
-      operation: LogOperation.SCAN,
+      operation: LogOperation.scan,
       details: 'Scan completed - Found ${devices.length} device(s)',
-      status: LogStatus.SUCCESS,
+      status: LogStatus.success,
     );
 
     return devices;

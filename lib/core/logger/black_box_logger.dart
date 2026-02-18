@@ -63,6 +63,7 @@ class BlackBoxLogger {
 
       await file.writeAsString(logLine, mode: FileMode.append);
     } catch (e) {
+      // ignore: avoid_print
       print('Logger error: $e');
     }
   }
@@ -94,6 +95,7 @@ class BlackBoxLogger {
 
       return allLogs;
     } catch (e) {
+      // ignore: avoid_print
       print('Error reading logs: $e');
       return [];
     }
@@ -159,6 +161,7 @@ class BlackBoxLogger {
         }
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Cleanup error: $e');
     }
   }
@@ -192,18 +195,18 @@ class LogEntry {
 }
 
 enum LogOperation {
-  COMMAND,
-  APK_INSTALL,
-  PERMISSION_GRANT,
-  EMERGENCY,
-  CONNECTION,
-  DISCONNECTION,
-  ERROR,
-  SCAN,
+  command,
+  apkInstall,
+  permissionGrant,
+  emergency,
+  connection,
+  disconnection,
+  error,
+  scan,
 }
 
 enum LogStatus {
-  SUCCESS,
-  FAILED,
-  WARNING,
+  success,
+  failed,
+  warning,
 }

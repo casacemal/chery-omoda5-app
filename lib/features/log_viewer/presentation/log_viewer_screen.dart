@@ -93,7 +93,7 @@ class _LogViewerScreenState extends State<LogViewerScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
+                    color: statusColor.withAlpha(51), // withOpacity(0.2)
                     borderRadius: BorderRadius.circular(2)),
                 child: Text(log.operation,
                     style: TextStyle(
